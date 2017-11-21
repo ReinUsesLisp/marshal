@@ -5,7 +5,7 @@ http://ruby-doc.org/core-2.4.2/Marshal.html
 Marshal translates this byte stream format into a tree of C structures
 readable by the application. It avoids a program (or library) having to
 include a full Ruby implementation as a dependency and execute it to be able
-to read or modify marshaled data.
+to read or modify marshaled data. Supported format is 4.8
 
 It's written in ANSI C (because it does not hurt) and uses its standard
 library as a dependency.
