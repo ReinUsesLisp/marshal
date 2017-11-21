@@ -1,31 +1,31 @@
 Marshal is a C implementation of Ruby's Marshal module which "converts
 collections of Ruby objects into a byte stream,..." according to
-http://ruby-doc.org/core-2.4.2/Marshal.html  
+http://ruby-doc.org/core-2.4.2/Marshal.html
 
 Marshal translates this byte stream format into a tree of C structures
 readable by the application. It avoids a program (or library) having to
 include a full Ruby implementation as a dependency and execute it to be able
-to read or modify marshaled data.  
+to read or modify marshaled data.
 
 It's written in ANSI C (because it does not hurt) and uses its standard
-library as a dependency.  
+library as a dependency.
 
 Structures are hosted in a common union named marshal_t. For details, check
-src/marshal.h  
+src/marshal.h
 
 A printer example is in the "examples/" directory. As first argument it takes
 a Ruby marshal only and prints like Ruby's "p" function would do (excluding
 user defined objects). To build it (after installing Marshal), just run make
-in "examples/". Test it executing "$ ./printer dump".  
+in "examples/". Test it executing "$ ./printer dump".
 
-This library is still under heavy development. Here's a TODO list:  
-Encoding support.  
-Backward compatibility.  
-String encodings (currently ignored).  
-Regex.  
-Test more object formats.  
+This library is still under heavy development. Here's a TODO list:
+Encoding support.
+Backward compatibility.
+String encodings (currently ignored).
+Regex.
+Test more object formats.
 
 For bug reports, please open an issue via Github or contact me through
-reinuseslisp@airmail.cc  
+reinuseslisp@airmail.cc
 
 This software is licensed under LGPLv3 and its example under GPLv3.
