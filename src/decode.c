@@ -286,7 +286,7 @@ decode_old_string(marshal_t *m, buf_t *buf, cache_t *cache)
 {
 	m->type = MARSHAL_STRING;
 	m->string.data = read_chars(buf);
-	m->string.data_size = strlen(read_chars(buf));
+	m->string.data_size = strlen(m->string.data);
 	CHECK_NULL(m->string.data);
 	m->string.count = 0;
 	m->string.pairs = NULL;
@@ -439,7 +439,7 @@ decode_type_case(marshal_t *m, buf_t *buf, cache_t *cache)
 		case M_USERDEF: return decode_userdef(m, buf, cache);
 		case M_OBJECT_REF: return decode_object_ref(m, buf, cache);
 		default:
-			/* printf("%c\n", type); */
+			/* printf("%d (%c)\n", type, type); */
 			return FAILED;
 	}
 }
@@ -450,7 +450,7 @@ decode(buf_t *buf, cache_t *cache)
 	marshal_t *marshal = malloc(sizeof(marshal_t));
 	if (!marshal)
 		return NULL;
-	if (decode_type_case(marshal, buf, cache))
+	if (FAILED == decode_type_case(marshal, buf, cache))
 	{
 		free(marshal);
 		return NULL;
