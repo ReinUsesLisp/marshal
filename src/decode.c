@@ -83,7 +83,7 @@ read_integer(buf_t *buf)
 	}
 	else if (raw <= 0x7F)
 		return raw - 5;
-	else if (raw <= 0xFD)
+	else if (raw <= 0xFB)
 		return raw - 0xFB;
 	else if (raw <= 0xFF)
 	{
@@ -286,6 +286,7 @@ decode_old_string(marshal_t *m, buf_t *buf, cache_t *cache)
 {
 	m->type = MARSHAL_STRING;
 	m->string.data = read_chars(buf);
+	m->string.data_size = strlen(read_chars(buf));
 	CHECK_NULL(m->string.data);
 	m->string.count = 0;
 	m->string.pairs = NULL;
@@ -321,6 +322,7 @@ decode_ivar(marshal_t *m, buf_t *buf, cache_t *cache)
 	{
 		case M_STRING:
 			m->type = MARSHAL_STRING;
+			m->string.data_size = data_len;
 			m->string.data = data;
 			m->string.count = count;
 			m->string.pairs = pairs;
