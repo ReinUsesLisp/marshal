@@ -205,15 +205,20 @@ encode_hash(const marshal_t *m, buf_t *buf)
 	return OK;
 }
 
-/* TODO: as long as encoding is not supported, strings can be saved using
- * "old-string" interface */
 static int
 encode_string(const marshal_t *m, buf_t *buf)
 {
-	int type = M_OLD_STRING;
+	int type = M_IVAR;
+	int subtype = M_STRING;
+
 	CHECK(write(&type, 1, buf));
+	CHECK(write(&subtype, 1, buf));
 	CHECK(write_integer(buf, m->string.data_size));
 	CHECK(write(m->string.data, m->string.data_size, buf));
+	/* encoding must be in pairs */
+	CHECK(write_integer(buf, m->string.count));
+	CHECK(write_values(buf, (const void **)m->string.pairs,
+		m->string.count*2));
 	return OK;
 }
 
