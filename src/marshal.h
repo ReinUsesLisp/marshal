@@ -17,6 +17,8 @@
 #ifndef _MARSHAL_H_
 #define _MARSHAL_H_
 
+#include <stddef.h>
+
 /* from http://gcc.gnu.org/wiki/Visibility */
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef MARSHAL_BUILDING
@@ -61,51 +63,51 @@ extern "C" {
 
 #define MARSHAL_ENCODE_UTF8 1
 
-typedef struct
+typedef struct marshal_nil_t
 {
 	int type;
 } marshal_nil_t;
 
-typedef struct
+typedef struct marshal_boolean_t
 {
 	int type;
 	int value;
 } marshal_boolean_t;
 
-typedef struct
+typedef struct marshal_integer_t
 {
 	int type;
 	int value;
 } marshal_integer_t;
 
-typedef struct
+typedef struct marshal_bignum_t
 {
 	int type;
-	int sign;
+	int sign; /* 1: positive, -1: negative */
 	int length;
 	unsigned char *bytes;
 } marshal_bignum_t;
 
-typedef struct
+typedef struct marshal_float_t
 {
 	int type;
 	double value;
 } marshal_float_t;
 
-typedef struct
+typedef struct marshal_symbol_t
 {
 	int type;
 	char *name;
 } marshal_symbol_t;
 
-typedef struct
+typedef struct marshal_array_t
 {
 	int type;
 	int count;
 	void **values;
 } marshal_array_t;
 
-typedef struct
+typedef struct marshal_hash_t
 {
 	int type;
 	int count;
@@ -113,7 +115,7 @@ typedef struct
 	void *def;
 } marshal_hash_t;
 
-typedef struct
+typedef struct marshal_string_t
 {
 	int type;
 	int data_size;
@@ -123,7 +125,7 @@ typedef struct
 	int encoding;
 } marshal_string_t;
 
-typedef struct
+typedef struct marshal_regex_t
 {
 	int type;
 	int data_size;
@@ -133,19 +135,19 @@ typedef struct
 	/* TODO */
 } marshal_regex_t;
 
-typedef struct
+typedef struct marshal_class_t
 {
 	int type;
 	char *name;
 } marshal_class_t;
 
-typedef struct
+typedef struct marshal_module_t
 {
 	int type;
 	char *name;
 } marshal_module_t;
 
-typedef struct
+typedef struct marshal_object_t
 {
 	int type;
 	int count;
@@ -154,7 +156,7 @@ typedef struct
 	void *symbol_instance;
 } marshal_object_t;
 
-typedef struct
+typedef struct marshal_userdef_t
 {
 	int type;
 	int size;
@@ -163,7 +165,7 @@ typedef struct
 	void *symbol_instance;
 } marshal_userdef_t;
 
-typedef union
+typedef union marshal_t
 {
 	int type;
 	marshal_nil_t nil;
@@ -182,20 +184,54 @@ typedef union
 	marshal_userdef_t userdef;
 } marshal_t;
 
+/*
+ * decodes a marshal byte stream
+ * returns NULL on failure
+ */
 MARSHAL_API marshal_t *
 marshal_decode(const void *data);
 
+/*
+ * decodes a marshal file
+ * returns NULL on failure
+ */
 MARSHAL_API marshal_t *
 marshal_decode_file(const char *path);
 
+/*
+ * makes a deep copy (hosted in fresh memory) of a marshal C structure
+ * returns NULL on failure
+ */
 MARSHAL_API marshal_t *
 marshal_clone(marshal_t *dest, const marshal_t *src);
 
+/*
+ * encodes a marshal C structure into a malloc-allocated buffer
+ * buffer's size is returned in size argument (it can be NULL)
+ * returns NULL on failure
+ */
+MARSHAL_API void *
+marshal_encode(const marshal_t *marshal, size_t *size);
+
+/*
+ * writes a marshal C structure into a file
+ * returns 0 on success
+ */
+MARSHAL_API int
+marshal_encode_file(const char *path, const marshal_t *marshal);
+
+/*
+ * deallocates memory used by a marshal C struct, include the pointer itself
+ * it should never fail with a cloned or decoded structure
+ */
 MARSHAL_API void
 marshal_free(marshal_t *marshal);
 
-/* stream NULL uses stdout
- * "void *" type is used here to avoid including stdio.h */
+/*
+ * prints a marshal C struct like Ruby's "p" function would do
+ * stream NULL uses stdout
+ * "void *" type is used here to avoid including stdio.h
+ */
 MARSHAL_API void
 marshal_print(const marshal_t *marshal, void *stream);
 
