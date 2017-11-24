@@ -22,10 +22,10 @@ This library is still under heavy development. Here's a TODO list:
 Encoding support.
 Backward compatibility.
 String encodings (currently ignored).
-Regex.
+Regex and other primitives.
 Test more object formats.
 
 For bug reports, please open an issue via Github or contact me through
 reinuseslisp@airmail.cc
 
-This software is licensed under LGPLv3 and its example under GPLv3.
+This software is licensed under LGPLv3 and its examples are under GPLv3.
