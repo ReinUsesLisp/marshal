@@ -1,0 +1,12 @@
+*.o
+*.swp
+*.lo
+*.la
+.libs/
+.deps/
+.dirstamp
+Makefile
+config.log
+config.status
+libtool
+src/Makefile
