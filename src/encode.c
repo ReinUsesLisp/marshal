@@ -21,7 +21,7 @@
 #include "format.h"
 
 #define BUFFER_GROW_RATE 4096 /* heap */
-#define FLOAT_BUFFER_SIZE 128 /* stack */
+#define FLOAT_BUFFER_SIZE 256 /* stack */
 
 #define OK 0
 #define FAILED 1
@@ -110,7 +110,7 @@ write_integer(buf_t *buf, int integer)
 }
 
 static int
-write_values(buf_t *buf, const void **values, int count)
+write_values(buf_t *buf, void **values, int count)
 {
 	int i;
 	for (i = 0; i < count; i++)
@@ -161,7 +161,8 @@ encode_float(const marshal_t *m, buf_t *buf)
 	char str[FLOAT_BUFFER_SIZE];
 	int len;
 
-	snprintf(str, sizeof(str), "%f", m->float_no.value);
+	/* snprintf would be safer, but it's not ansi C */
+	sprintf(str, "%f", m->float_no.value);
 	len = (int)strlen(str); /* trust snprintf */
 
 	CHECK(write(&type, 1, buf));
@@ -187,8 +188,7 @@ encode_array(const marshal_t *m, buf_t *buf)
 	int type = M_ARRAY;
 	CHECK(write(&type, 1, buf));
 	CHECK(write_integer(buf, m->array.count));
-	CHECK(write_values(buf, (const void **)m->array.values,
-		m->array.count));
+	CHECK(write_values(buf, m->array.values, m->array.count));
 	return OK;
 }
 
@@ -198,8 +198,7 @@ encode_hash(const marshal_t *m, buf_t *buf)
 	int type = m->hash.def ? M_HASH_DEFAULT : M_HASH;
 	CHECK(write(&type, 1, buf));
 	CHECK(write_integer(buf, m->hash.count));
-	CHECK(write_values(buf, (const void **)m->hash.pairs,
-		m->hash.count*2));
+	CHECK(write_values(buf, m->hash.pairs, m->hash.count*2));
 	if (m->hash.def)
 		CHECK(encode(m->hash.def, buf));
 	return OK;
@@ -217,8 +216,53 @@ encode_string(const marshal_t *m, buf_t *buf)
 	CHECK(write(m->string.data, m->string.data_size, buf));
 	/* encoding must be in pairs */
 	CHECK(write_integer(buf, m->string.count));
-	CHECK(write_values(buf, (const void **)m->string.pairs,
-		m->string.count*2));
+	CHECK(write_values(buf, m->string.pairs, m->string.count*2));
+	return OK;
+}
+
+static int
+encode_class(const marshal_t *m, buf_t *buf)
+{
+	int type = M_CLASS;
+	int len = (int)strlen(m->klass.name);
+	CHECK(write(&type, 1, buf));
+	CHECK(write_integer(buf, len));
+	CHECK(write(m->klass.name, len, buf));
+	return OK;
+}
+
+static int
+encode_module(const marshal_t *m, buf_t *buf)
+{
+	int type = M_MODULE;
+	int len = (int)strlen(m->module.name);
+	CHECK(write(&type, 1, buf));
+	CHECK(write_integer(buf, len));
+	CHECK(write(m->module.name, len, buf));
+	return OK;
+}
+
+static int
+encode_object(const marshal_t *m, buf_t *buf)
+{
+	int type = M_OBJECT;
+	CHECK(write(&type, 1, buf));
+	/* write class type (e.g. MyClass) */
+	CHECK(encode(m->object.symbol_instance, buf));
+	CHECK(write_integer(buf, m->object.count));
+	CHECK(write_values(buf, m->object.vars, m->object.count*2));
+	return OK;
+}
+
+static int
+encode_userdef(const marshal_t *m, buf_t *buf)
+{
+	int type = M_USERDEF;
+	CHECK(write(&type, 1, buf));
+	/* class name */
+	CHECK(encode(m->userdef.symbol_instance, buf));
+	CHECK(write_integer(buf, m->userdef.size));
+	CHECK(write(m->userdef.data, m->userdef.size, buf));
 	return OK;
 }
 
@@ -236,8 +280,12 @@ encode(const marshal_t *m, buf_t *buf)
 		case MARSHAL_ARRAY: return encode_array(m, buf);
 		case MARSHAL_HASH: return encode_hash(m, buf);
 		case MARSHAL_STRING: return encode_string(m, buf);
+		case MARSHAL_CLASS: return encode_class(m, buf);
+		case MARSHAL_MODULE: return encode_module(m, buf);
+		case MARSHAL_OBJECT: return encode_object(m, buf);
+		case MARSHAL_USERDEF: return encode_userdef(m, buf);
 		default:
-			fprintf(stderr, "not implemented %d\n", m->type);
+			/* fprintf(stderr, "not implemented %d\n", m->type); */
 			return FAILED;
 	}
 }
