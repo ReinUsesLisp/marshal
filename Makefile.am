@@ -6,6 +6,7 @@ libmarshal_la_SOURCES = \
 	src/format.h \
 	src/clone.c \
 	src/decode.c \
+	src/encode.c \
 	src/free.c \
 	src/print.c
 pkginclude_HEADERS = src/marshal.h
