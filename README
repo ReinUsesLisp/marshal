@@ -15,8 +15,8 @@ src/marshal.h
 
 A printer example is in the "examples/" directory. As first argument it takes
 a Ruby marshal only and prints like Ruby's "p" function would do (excluding
-user defined objects). To build it (after installing Marshal), just run make
-in "examples/". Test it executing "$ ./printer dump".
+user defined objects). To build it (after installing Marshal), just run
+build.sh in "examples/". Test it executing "$ ./printer dump".
 
 This library is still under heavy development. Here's a TODO list:
 Encoding support.
