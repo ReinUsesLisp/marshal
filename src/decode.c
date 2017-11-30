@@ -136,6 +136,42 @@ decode_values(int count, buf_t *buf, cache_t *cache)
 }
 
 static int
+search_encoding(int count, void **pairs)
+{
+	int i;
+	int default_encoding = MARSHAL_ENCODING_ASCII_8BIT;
+
+	for (i = 0; i < count; i++)
+	{
+		marshal_t *key = pairs[i*2];
+		marshal_t *value = pairs[i*2+1];
+
+		if (MARSHAL_SYMBOL != key->type)
+			continue;
+
+		/* symbol E can be true or false */
+		if (0 == strcmp("E", key->symbol.name)
+				&& MARSHAL_BOOLEAN == value->type)
+		{
+			return value->boolean.value ?
+				MARSHAL_ENCODING_UTF_8 :
+				MARSHAL_ENCODING_US_ASCII;
+		}
+		/* :encoding is holds an old-string */
+		else if (0 == strcmp("encoding", key->symbol.name)
+				&& MARSHAL_STRING == value->type)
+		{
+			const char *data = value->string.data;
+			int encoding = marshal_encoding_name_to_id(data);
+			/* negative means invalid */
+			return encoding < 0 ? default_encoding : encoding ;
+		}
+	}
+	return default_encoding;
+}
+
+
+static int
 decode_nil(marshal_t *m)
 {
 	m->type = MARSHAL_NIL;
@@ -290,7 +326,7 @@ decode_old_string(marshal_t *m, buf_t *buf, cache_t *cache)
 	CHECK_NULL(m->string.data);
 	m->string.count = 0;
 	m->string.pairs = NULL;
-	m->string.encoding = MARSHAL_ENCODE_UTF8;
+	m->string.encoding = MARSHAL_ENCODING_ASCII_8BIT;
 	return add_object(cache, m);
 }
 
@@ -326,8 +362,7 @@ decode_ivar(marshal_t *m, buf_t *buf, cache_t *cache)
 			m->string.data = data;
 			m->string.count = count;
 			m->string.pairs = pairs;
-			/* TODO read encoding */
-			m->string.encoding = MARSHAL_ENCODE_UTF8;
+			m->string.encoding = search_encoding(count, pairs);
 			break;
 
 		case M_REGEX:

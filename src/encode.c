@@ -207,16 +207,27 @@ encode_hash(const marshal_t *m, buf_t *buf)
 static int
 encode_string(const marshal_t *m, buf_t *buf)
 {
-	int type = M_IVAR;
-	int subtype = M_STRING;
-
-	CHECK(write(&type, 1, buf));
-	CHECK(write(&subtype, 1, buf));
-	CHECK(write_integer(buf, m->string.data_size));
-	CHECK(write(m->string.data, m->string.data_size, buf));
-	/* encoding must be in pairs */
-	CHECK(write_integer(buf, m->string.count));
-	CHECK(write_values(buf, m->string.pairs, m->string.count*2));
+	/* old string */
+	if (MARSHAL_ENCODING_ASCII_8BIT == m->string.encoding)
+	{
+		int type = M_OLD_STRING;
+		CHECK(write(&type, 1, buf));
+		CHECK(write_integer(buf, m->string.data_size));
+		CHECK(write(m->string.data, m->string.data_size, buf));
+	}
+	/* ivar */
+	else
+	{
+		int type = M_IVAR;
+		int subtype = M_STRING;
+		CHECK(write(&type, 1, buf));
+		CHECK(write(&subtype, 1, buf));
+		CHECK(write_integer(buf, m->string.data_size));
+		CHECK(write(m->string.data, m->string.data_size, buf));
+		/* TODO encoding must be in pairs */
+		CHECK(write_integer(buf, m->string.count));
+		CHECK(write_values(buf, m->string.pairs, m->string.count*2));
+	}
 	return OK;
 }
 

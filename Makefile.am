@@ -8,5 +8,6 @@ libmarshal_la_SOURCES = \
 	src/decode.c \
 	src/encode.c \
 	src/free.c \
-	src/print.c
+	src/print.c \
+	src/encoding.c
 pkginclude_HEADERS = src/marshal.h

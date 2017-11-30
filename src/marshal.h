@@ -61,7 +61,108 @@ extern "C" {
 #define MARSHAL_OBJECT  12
 #define MARSHAL_USERDEF 13
 
-#define MARSHAL_ENCODE_UTF8 1
+/* http://ruby_doc.org/core_2.4.2/Encoding.html#method_c_list */
+#define MARSHAL_ENCODING_ASCII_8BIT                 0 /* aka OLD_STRING */
+#define MARSHAL_ENCODING_UTF_8                      1 /* aka T */
+#define MARSHAL_ENCODING_US_ASCII                   2 /* aka F */
+#define MARSHAL_ENCODING_UTF_16BE                   3
+#define MARSHAL_ENCODING_UTF_16LE                   4
+#define MARSHAL_ENCODING_UTF_32BE                   5
+#define MARSHAL_ENCODING_UTF_32LE                   6
+#define MARSHAL_ENCODING_UTF_16                     7
+#define MARSHAL_ENCODING_UTF_32                     8
+#define MARSHAL_ENCODING_UTF8_MAC                   9
+#define MARSHAL_ENCODING_EUC_JP                     10
+#define MARSHAL_ENCODING_Windows_31J                11
+#define MARSHAL_ENCODING_Big5                       12
+#define MARSHAL_ENCODING_Big5_HKSCS                 13
+#define MARSHAL_ENCODING_Big5_UAO                   14
+#define MARSHAL_ENCODING_CP949                      15
+#define MARSHAL_ENCODING_Emacs_Mule                 16
+#define MARSHAL_ENCODING_EUC_KR                     17
+#define MARSHAL_ENCODING_EUC_TW                     18
+#define MARSHAL_ENCODING_GB2312                     19
+#define MARSHAL_ENCODING_GB18030                    20
+#define MARSHAL_ENCODING_GBK                        21
+#define MARSHAL_ENCODING_ISO_8859_1                 22
+#define MARSHAL_ENCODING_ISO_8859_2                 23
+#define MARSHAL_ENCODING_ISO_8859_3                 24
+#define MARSHAL_ENCODING_ISO_8859_4                 25
+#define MARSHAL_ENCODING_ISO_8859_5                 26
+#define MARSHAL_ENCODING_ISO_8859_6                 27
+#define MARSHAL_ENCODING_ISO_8859_7                 28
+#define MARSHAL_ENCODING_ISO_8859_8                 29
+#define MARSHAL_ENCODING_ISO_8859_9                 30
+#define MARSHAL_ENCODING_ISO_8859_10                31
+#define MARSHAL_ENCODING_ISO_8859_11                32
+#define MARSHAL_ENCODING_ISO_8859_13                33
+#define MARSHAL_ENCODING_ISO_8859_14                34
+#define MARSHAL_ENCODING_ISO_8859_15                35
+#define MARSHAL_ENCODING_ISO_8859_16                36
+#define MARSHAL_ENCODING_KOI8_R                     37
+#define MARSHAL_ENCODING_KOI8_U                     38
+#define MARSHAL_ENCODING_Shift_JIS                  39
+#define MARSHAL_ENCODING_Windows_1250               40
+#define MARSHAL_ENCODING_Windows_1251               41
+#define MARSHAL_ENCODING_Windows_1252               42
+#define MARSHAL_ENCODING_Windows_1253               43
+#define MARSHAL_ENCODING_Windows_1254               44
+#define MARSHAL_ENCODING_Windows_1257               45
+#define MARSHAL_ENCODING_IBM437                     46
+#define MARSHAL_ENCODING_IBM737                     47
+#define MARSHAL_ENCODING_IBM775                     48
+#define MARSHAL_ENCODING_CP850                      49
+#define MARSHAL_ENCODING_IBM852                     50
+#define MARSHAL_ENCODING_CP852                      51
+#define MARSHAL_ENCODING_IBM855                     52
+#define MARSHAL_ENCODING_CP855                      53
+#define MARSHAL_ENCODING_IBM857                     54
+#define MARSHAL_ENCODING_IBM860                     55
+#define MARSHAL_ENCODING_IBM861                     56
+#define MARSHAL_ENCODING_IBM862                     57
+#define MARSHAL_ENCODING_IBM863                     58
+#define MARSHAL_ENCODING_IBM864                     59
+#define MARSHAL_ENCODING_IBM865                     60
+#define MARSHAL_ENCODING_IBM866                     61
+#define MARSHAL_ENCODING_IBM869                     62
+#define MARSHAL_ENCODING_Windows_1258               63
+#define MARSHAL_ENCODING_GB1988                     64
+#define MARSHAL_ENCODING_macCentEuro                65
+#define MARSHAL_ENCODING_macCroatian                66
+#define MARSHAL_ENCODING_macCyrillic                67
+#define MARSHAL_ENCODING_macGreek                   68
+#define MARSHAL_ENCODING_macIceland                 69
+#define MARSHAL_ENCODING_macRoman                   70
+#define MARSHAL_ENCODING_macRomania                 71
+#define MARSHAL_ENCODING_macThai                    72
+#define MARSHAL_ENCODING_macTurkish                 73
+#define MARSHAL_ENCODING_macUkraine                 74
+#define MARSHAL_ENCODING_CP950                      75
+#define MARSHAL_ENCODING_CP951                      76
+#define MARSHAL_ENCODING_IBM037                     77
+#define MARSHAL_ENCODING_stateless_ISO_2022_JP      78
+#define MARSHAL_ENCODING_eucJP_ms                   79
+#define MARSHAL_ENCODING_CP51932                    80
+#define MARSHAL_ENCODING_EUC_JIS_2004               81
+#define MARSHAL_ENCODING_GB12345                    82
+#define MARSHAL_ENCODING_ISO_2022_JP                83
+#define MARSHAL_ENCODING_ISO_2022_JP_2              84
+#define MARSHAL_ENCODING_CP50220                    85
+#define MARSHAL_ENCODING_CP50221                    86
+#define MARSHAL_ENCODING_Windows_1256               87
+#define MARSHAL_ENCODING_Windows_1255               88
+#define MARSHAL_ENCODING_TIS_620                    89
+#define MARSHAL_ENCODING_Windows_874                90
+#define MARSHAL_ENCODING_MacJapanese                91
+#define MARSHAL_ENCODING_UTF_7                      92
+#define MARSHAL_ENCODING_UTF8_DoCoMo                93
+#define MARSHAL_ENCODING_SJIS_DoCoMo                94
+#define MARSHAL_ENCODING_UTF8_KDDI                  95
+#define MARSHAL_ENCODING_SJIS_KDDI                  96
+#define MARSHAL_ENCODING_ISO_2022_JP_KDDI           97
+#define MARSHAL_ENCODING_stateless_ISO_2022_JP_KDDI 98
+#define MARSHAL_ENCODING_UTF8_SoftBank              99
+#define MARSHAL_ENCODING_SJIS_SoftBank              100
 
 typedef struct marshal_nil_t
 {
@@ -83,7 +184,7 @@ typedef struct marshal_integer_t
 typedef struct marshal_bignum_t
 {
 	int type;
-	int sign; /* 1: positive, -1: negative */
+	int sign; /* 1: positive, _1: negative */
 	int length;
 	unsigned char *bytes;
 } marshal_bignum_t;
@@ -199,14 +300,7 @@ MARSHAL_API marshal_t *
 marshal_decode_file(const char *path);
 
 /*
- * makes a deep copy (hosted in fresh memory) of a marshal C structure
- * returns NULL on failure
- */
-MARSHAL_API marshal_t *
-marshal_clone(marshal_t *dest, const marshal_t *src);
-
-/*
- * encodes a marshal C structure into a malloc-allocated buffer
+ * encodes a marshal C structure into a malloc_allocated buffer
  * buffer's size is returned in size argument (it can be NULL)
  * returns NULL on failure
  */
@@ -228,12 +322,32 @@ MARSHAL_API void
 marshal_free(marshal_t *marshal);
 
 /*
+ * makes a deep copy (hosted in fresh memory) of a marshal C structure
+ * returns NULL on failure
+ */
+MARSHAL_API marshal_t *
+marshal_clone(marshal_t *dest, const marshal_t *src);
+
+/*
  * prints a marshal C struct like Ruby's "p" function would do
  * stream NULL uses stdout
  * "void *" type is used here to avoid including stdio.h
  */
 MARSHAL_API void
 marshal_print(const marshal_t *marshal, void *stream);
+
+/*
+ * TODO description
+ */
+MARSHAL_API int
+marshal_encoding_name_to_id(const char *name);
+
+/*
+ * TODO description
+ */
+MARSHAL_API const char *
+marshal_encoding_id_to_name(int id);
+
 
 #ifdef __cplusplus
 }
