@@ -20,10 +20,9 @@ build.sh in "examples/". Test it executing "$ ./printer dump".
 
 This library is still under heavy development. Here's a TODO list:
 Backward compatibility.
-String encodings (currently ignored).
 Regex and other primitives (encode and decode).
 Test more object formats.
-Access functions.
+Access functions (e.g. hash reading and string writing)
 
 For bug reports, please open an issue via Github or contact me through
 reinuseslisp@airmail.cc
