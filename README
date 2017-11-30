@@ -22,7 +22,7 @@ This library is still under heavy development. Here's a TODO list:
 Backward compatibility.
 Regex and other primitives (encode and decode).
 Test more object formats.
-Access functions (e.g. hash reading and string writing)
+Access functions (e.g. hash finding and string editing)
 
 For bug reports, please open an issue via Github or contact me through
 reinuseslisp@airmail.cc
