@@ -10,3 +10,4 @@ config.log
 config.status
 libtool
 src/Makefile
+autom4te.cache/
