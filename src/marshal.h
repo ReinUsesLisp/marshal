@@ -337,13 +337,13 @@ MARSHAL_API void
 marshal_print(const marshal_t *marshal, void *stream);
 
 /*
- * TODO description
+ * translates a Ruby encoding name into an integer id
  */
 MARSHAL_API int
 marshal_encoding_name_to_id(const char *name);
 
 /*
- * TODO description
+ * inverse of marshal_encoding_name_to_id
  */
 MARSHAL_API const char *
 marshal_encoding_id_to_name(int id);
