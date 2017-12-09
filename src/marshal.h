@@ -184,7 +184,7 @@ typedef struct marshal_integer_t
 typedef struct marshal_bignum_t
 {
 	int type;
-	int sign; /* 1: positive, _1: negative */
+	int sign; /* 1: positive, -1: negative */
 	int length;
 	unsigned char *bytes;
 } marshal_bignum_t;
@@ -222,7 +222,7 @@ typedef struct marshal_string_t
 	int data_size;
 	void *data;
 	int count;
-	void **pairs;
+	void **pairs; /* even key, odd value */
 	int encoding;
 } marshal_string_t;
 
@@ -253,7 +253,7 @@ typedef struct marshal_object_t
 	int type;
 	int count;
 	char *klass;
-	void **vars;
+	void **vars; /* even name, odd value */
 	void *symbol_instance;
 } marshal_object_t;
 
@@ -285,69 +285,124 @@ typedef union marshal_t
 	marshal_userdef_t userdef;
 } marshal_t;
 
-/*
- * decodes a marshal byte stream
- * returns NULL on failure
- */
+/* decodes a marshal byte stream
+   returns NULL on failure */
 MARSHAL_API marshal_t *
 marshal_decode(const void *data);
 
-/*
- * decodes a marshal file
- * returns NULL on failure
- */
+/* decodes a marshal file
+   returns NULL on failure */
 MARSHAL_API marshal_t *
 marshal_decode_file(const char *path);
 
-/*
- * encodes a marshal C structure into a malloc_allocated buffer
- * buffer's size is returned in size argument (it can be NULL)
- * returns NULL on failure
- */
+/* encodes a marshal C structure into a malloc_allocated buffer
+   buffer's size is returned in size argument (it can be NULL)
+   returns NULL on failure */
 MARSHAL_API void *
 marshal_encode(const marshal_t *marshal, size_t *size);
 
-/*
- * writes a marshal C structure into a file
- * returns 0 on success
- */
+/* writes a marshal C structure into a file
+   returns 0 on success */
 MARSHAL_API int
 marshal_encode_file(const char *path, const marshal_t *marshal);
 
-/*
- * deallocates memory used by a marshal C struct, include the pointer itself
- * it should never fail with a cloned or decoded structure
- */
+/* deallocates memory used by a marshal C struct, include the pointer itself
+   it should never fail with a cloned or decoded structure */
 MARSHAL_API void
 marshal_free(marshal_t *marshal);
 
-/*
- * makes a deep copy (hosted in fresh memory) of a marshal C structure
- * returns NULL on failure
- */
+/* makes a deep copy (hosted in fresh memory) of a marshal C structure
+   returns NULL on failure */
 MARSHAL_API marshal_t *
 marshal_clone(marshal_t *dest, const marshal_t *src);
 
-/*
- * prints a marshal C struct like Ruby's "p" function would do
- * stream NULL uses stdout
- * "void *" type is used here to avoid including stdio.h
- */
+/* compares two marshal C structs, returns 1 if they are equal
+   (something like Common Lisp's #'equal and not #'eq)
+   strings must share encoding to be equal */
+MARSHAL_API int
+marshal_equal(const marshal_t *marshal1, const marshal_t *marshal2);
+
+/* prints a marshal C struct like Ruby's "p" function would do
+   stream NULL uses stdout
+   "void *" type is used here to avoid including stdio.h */
 MARSHAL_API void
 marshal_print(const marshal_t *marshal, void *stream);
 
-/*
- * translates a Ruby encoding name into an integer id
- */
+/* translates a Ruby encoding name into an integer id */
 MARSHAL_API int
 marshal_encoding_name_to_id(const char *name);
 
-/*
- * inverse of marshal_encoding_name_to_id
- */
+/* inverse of marshal_encoding_name_to_id */
 MARSHAL_API const char *
 marshal_encoding_id_to_name(int id);
 
+/* returns array[index] and NULL on failure */
+MARSHAL_API marshal_t *
+marshal_array_get(const marshal_t *array, int index);
+
+/* array += [value]
+   returns array on success, NULL on failure */
+MARSHAL_API marshal_t *
+marshal_array_add(marshal_t *array, marshal_t *value);
+
+/* array.delete_index(index)
+   returns array on success, NULL on failure */
+MARSHAL_API marshal_t *
+marshal_array_del(marshal_t *array, int index);
+
+/* returns hash[key] and NULL on failure */
+MARSHAL_API marshal_t *
+marshal_hash_get(const marshal_t *hash, const marshal_t *key);
+
+/* hash[key] = value
+   returns value on success, NULL on failure */
+MARSHAL_API marshal_t *
+marshal_hash_set(marshal_t *hash, marshal_t *key, marshal_t *value);
+
+/* finds an instance variable in a marshal object,
+   returns NULL when it's not found or a non-object is provided */
+MARSHAL_API marshal_t *
+marshal_object_get(const marshal_t *marshal, const char *name);
+
+/* make functions */
+MARSHAL_API marshal_t *
+marshal_make_nil();
+
+MARSHAL_API marshal_t *
+marshal_make_boolean(int value);
+
+MARSHAL_API marshal_t *
+marshal_make_integer(int value);
+
+MARSHAL_API marshal_t *
+marshal_make_bignum(int sign, int length, unsigned char *bytes);
+
+MARSHAL_API marshal_t *
+marshal_make_float(double value);
+
+MARSHAL_API marshal_t *
+marshal_make_symbol(const char *name);
+
+MARSHAL_API marshal_t *
+marshal_make_array();
+
+MARSHAL_API marshal_t *
+marshal_make_hash(marshal_t *def);
+
+MARSHAL_API marshal_t *
+marshal_make_ascii(const char *string);
+
+MARSHAL_API marshal_t *
+marshal_make_class(const char *name);
+
+MARSHAL_API marshal_t *
+marshal_make_module(const char *name);
+
+MARSHAL_API marshal_t *
+marshal_make_object(const char *klass);
+
+MARSHAL_API marshal_t *
+marshal_make_userdef(const char *klass, int size, const void *data);
 
 #ifdef __cplusplus
 }

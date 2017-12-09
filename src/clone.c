@@ -38,7 +38,7 @@ memory_clone(int len, void *src)
 }
 
 static char *
-string_clone(char *src)
+string_clone(const char *src)
 {
 	size_t len = strlen(src);
 	char *clone = malloc(len + 1);

@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include "marshal.h"
 
+/* I think some libc implementations do not take free(NULL) as a nop */
 static void
 sfree(void *mem)
 {

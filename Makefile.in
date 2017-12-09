@@ -136,9 +136,10 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 libmarshal_la_LIBADD =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libmarshal_la_OBJECTS = src/libmarshal_la-clone.lo \
-	src/libmarshal_la-decode.lo src/libmarshal_la-encode.lo \
-	src/libmarshal_la-free.lo src/libmarshal_la-print.lo \
-	src/libmarshal_la-encoding.lo
+	src/libmarshal_la-equal.lo src/libmarshal_la-decode.lo \
+	src/libmarshal_la-encode.lo src/libmarshal_la-free.lo \
+	src/libmarshal_la-print.lo src/libmarshal_la-encoding.lo \
+	src/libmarshal_la-access.lo src/libmarshal_la-make.lo
 libmarshal_la_OBJECTS = $(am_libmarshal_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -351,11 +352,14 @@ libmarshal_la_CFLAGS = -ansi -DMARSHAL_BUILDING
 libmarshal_la_SOURCES = \
 	src/format.h \
 	src/clone.c \
+	src/equal.c \
 	src/decode.c \
 	src/encode.c \
 	src/free.c \
 	src/print.c \
-	src/encoding.c
+	src/encoding.c \
+	src/access.c \
+	src/make.c
 
 pkginclude_HEADERS = src/marshal.h
 all: all-am
@@ -440,6 +444,8 @@ src/$(DEPDIR)/$(am__dirstamp):
 	@: > src/$(DEPDIR)/$(am__dirstamp)
 src/libmarshal_la-clone.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
+src/libmarshal_la-equal.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
 src/libmarshal_la-decode.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/libmarshal_la-encode.lo: src/$(am__dirstamp) \
@@ -449,6 +455,10 @@ src/libmarshal_la-free.lo: src/$(am__dirstamp) \
 src/libmarshal_la-print.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/libmarshal_la-encoding.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/libmarshal_la-access.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/libmarshal_la-make.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 
 libmarshal.la: $(libmarshal_la_OBJECTS) $(libmarshal_la_DEPENDENCIES) $(EXTRA_libmarshal_la_DEPENDENCIES) 
@@ -462,11 +472,14 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-access.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-clone.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-decode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-encode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-encoding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-equal.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-free.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-make.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libmarshal_la-print.Plo@am__quote@
 
 .c.o:
@@ -499,6 +512,13 @@ src/libmarshal_la-clone.lo: src/clone.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/clone.c' object='src/libmarshal_la-clone.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -c -o src/libmarshal_la-clone.lo `test -f 'src/clone.c' || echo '$(srcdir)/'`src/clone.c
+
+src/libmarshal_la-equal.lo: src/equal.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -MT src/libmarshal_la-equal.lo -MD -MP -MF src/$(DEPDIR)/libmarshal_la-equal.Tpo -c -o src/libmarshal_la-equal.lo `test -f 'src/equal.c' || echo '$(srcdir)/'`src/equal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libmarshal_la-equal.Tpo src/$(DEPDIR)/libmarshal_la-equal.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/equal.c' object='src/libmarshal_la-equal.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -c -o src/libmarshal_la-equal.lo `test -f 'src/equal.c' || echo '$(srcdir)/'`src/equal.c
 
 src/libmarshal_la-decode.lo: src/decode.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -MT src/libmarshal_la-decode.lo -MD -MP -MF src/$(DEPDIR)/libmarshal_la-decode.Tpo -c -o src/libmarshal_la-decode.lo `test -f 'src/decode.c' || echo '$(srcdir)/'`src/decode.c
@@ -534,6 +554,20 @@ src/libmarshal_la-encoding.lo: src/encoding.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/encoding.c' object='src/libmarshal_la-encoding.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -c -o src/libmarshal_la-encoding.lo `test -f 'src/encoding.c' || echo '$(srcdir)/'`src/encoding.c
+
+src/libmarshal_la-access.lo: src/access.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -MT src/libmarshal_la-access.lo -MD -MP -MF src/$(DEPDIR)/libmarshal_la-access.Tpo -c -o src/libmarshal_la-access.lo `test -f 'src/access.c' || echo '$(srcdir)/'`src/access.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libmarshal_la-access.Tpo src/$(DEPDIR)/libmarshal_la-access.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/access.c' object='src/libmarshal_la-access.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -c -o src/libmarshal_la-access.lo `test -f 'src/access.c' || echo '$(srcdir)/'`src/access.c
+
+src/libmarshal_la-make.lo: src/make.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -MT src/libmarshal_la-make.lo -MD -MP -MF src/$(DEPDIR)/libmarshal_la-make.Tpo -c -o src/libmarshal_la-make.lo `test -f 'src/make.c' || echo '$(srcdir)/'`src/make.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libmarshal_la-make.Tpo src/$(DEPDIR)/libmarshal_la-make.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='src/make.c' object='src/libmarshal_la-make.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmarshal_la_CFLAGS) $(CFLAGS) -c -o src/libmarshal_la-make.lo `test -f 'src/make.c' || echo '$(srcdir)/'`src/make.c
 
 mostlyclean-libtool:
 	-rm -f *.lo
