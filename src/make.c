@@ -22,7 +22,8 @@ static marshal_t *
 alloc(int type)
 {
 	marshal_t *m = calloc(1, sizeof(marshal_t));
-	m->type = type;
+	if (m)
+		m->type = type;
 	return m;
 }
 
