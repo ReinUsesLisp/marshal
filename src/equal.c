@@ -141,9 +141,9 @@ static int
 equal_userdef(const marshal_t *a, const marshal_t *b)
 {
 	int size = a->userdef.size;
-	return a->userdef.size != b->userdef.size
-		|| 0 != strcmp(a->userdef.klass, b->userdef.klass)
-		|| 0 != memcmp(a->userdef.data, b->userdef.data, size);
+	return a->userdef.size == b->userdef.size
+		&& 0 == strcmp(a->userdef.klass, b->userdef.klass)
+		&& 0 == memcmp(a->userdef.data, b->userdef.data, size);
 }
 
 static int
