@@ -56,7 +56,7 @@ marshal_array_del(marshal_t *array, int index)
 	/* remove it from values */
 	for (i = index; i < a->count-1; i++)
 		a->values[i] = a->values[i+1];
-	a->values[a->count] = NULL;
+	a->values[i] = NULL;
 
 	a->count--;
 	return array;
