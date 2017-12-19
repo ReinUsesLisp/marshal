@@ -19,6 +19,15 @@
 #include "marshal.h"
 
 marshal_t *
+marshal_array_get(const marshal_t *array, int index)
+{
+	marshal_array_t *a = (marshal_array_t *)array;
+	if (!a || MARSHAL_ARRAY != a->type || index >= a->count || !a->values)
+		return NULL;
+	return a->values[index];
+}
+
+marshal_t *
 marshal_array_add(marshal_t *array, marshal_t *value)
 {
 	marshal_array_t *a = (marshal_array_t *)array;
