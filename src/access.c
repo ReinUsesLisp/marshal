@@ -18,39 +18,17 @@
 #include <string.h>
 #include "marshal.h"
 
-#define SIZE_STEP 64
-
-static int
-size_from_count(int count)
-{
-	return count ? ((count-1) / SIZE_STEP + 1) * SIZE_STEP : 0;
-}
-
-marshal_t *
-marshal_array_get(const marshal_t *array, int index)
-{
-	const marshal_array_t *a = (marshal_array_t *)array;
-	if (MARSHAL_ARRAY != a->type || index >= a->count || index < 0)
-		return NULL;
-	return a->values[index];
-}
-
 marshal_t *
 marshal_array_add(marshal_t *array, marshal_t *value)
 {
 	marshal_array_t *a = (marshal_array_t *)array;
 	if (MARSHAL_ARRAY != a->type)
 		return NULL;
-
-	if (a->count >= size_from_count(a->count))
-	{
-		int new_size = size_from_count(a->count+1);
-		a->values = realloc(a->values, new_size * sizeof(void *));
-		/* if realloc fails then a->values have no reference
-		   a memory leak may occur */
-		if (!a->values)
-			return NULL;
-	}
+	a->values = realloc(a->values, (a->count+1) * sizeof(void *));
+	/* if realloc fails then a->values has no reference
+	   a memory leak may occur */
+	if (!a->values)
+		return NULL;
 	a->values[a->count] = value;
 	a->count++;
 	return array;
@@ -109,15 +87,10 @@ marshal_hash_set(marshal_t *hash, marshal_t *key, marshal_t *value)
 	/* no previous value found */
 	if (index < 0)
 	{
-		if (h->count >= size_from_count(h->count))
-		{
-			int new_size = 2 * size_from_count(h->count+1);
-			h->pairs =
-				realloc(h->pairs, new_size * sizeof(void *));
-			/* same as marshal_array_add, leak is possible */
-			if (!h->pairs)
-				return NULL;
-		}
+		h->pairs = realloc(h->pairs, (h->count+2) * sizeof(void *));
+		/* same as in marshal_array_add, leak is possible */
+		if (!h->pairs)
+			return NULL;
 		h->pairs[h->count*2] = key;
 		h->pairs[h->count*2+1] = value;
 		h->count++;
