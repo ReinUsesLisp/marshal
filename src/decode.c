@@ -43,11 +43,45 @@ typedef const void *buf_t;
 static marshal_t *
 decode(buf_t *buf, cache_t *cache);
 
+/* https://stackoverflow.com/questions/1001307 */
+union endian_checker
+{
+	unsigned int i;
+	char c[4];
+};
+
+static int
+is_big_endian()
+{
+	union endian_checker bint;
+	bint.i = 0x01020304;
+	return bint.c[0] == 1; 
+}
+
 static void
 read(void *ptr, size_t size, buf_t *buf)
 {
-	memcpy(ptr, *buf, size);
+	memcpy(ptr, *buf, size);	
 	*buf += size;
+}
+
+static void
+read_int(void *ptr, size_t size, size_t store, buf_t *buf)
+{
+	if (is_big_endian())
+	{
+		/* https://stackoverflow.com/questions/8571089 */
+		char *dest = ptr;
+		char *src = (char *)*buf;
+		size_t i, j;
+		
+		memset(dest, 0, store);
+		for (i = 0, j = store-1; i < size; i++, j--)
+			dest[j] = src[i];
+		*buf += size;
+	}
+	else
+		read(ptr, size, buf);
 }
 
 static int
@@ -70,15 +104,16 @@ add_object(cache_t *cache, marshal_t *new_obj)
 static int
 read_integer(buf_t *buf)
 {
-	long n = 0;
+	/* FIXME n is possible to overflow */
+	int n = 0;
 	int raw = 0;
-	read(&raw, 1, buf);
+	read_int(&raw, 1, sizeof(raw), buf);
 
 	if (0 == raw)
 		return 0;
 	else if (raw <= 5)
 	{
-		read(&n, raw, buf);
+		read_int(&n, raw, sizeof(n), buf);
 		return n;
 	}
 	else if (raw <= 0x7F)
@@ -88,7 +123,7 @@ read_integer(buf_t *buf)
 	else if (raw <= 0xFF)
 	{
 		int bytes = (0xFF+1) - raw;
-		read(&n, bytes, buf);
+		read_int(&n, bytes, sizeof(n), buf);
 		return n - (1 << bytes * 8);
 	}
 	/* it should never reach here,
@@ -221,6 +256,7 @@ decode_bignum(marshal_t *m, buf_t *buf, cache_t *cache)
 	m->bignum.bytes = malloc(m->bignum.length);
 	CHECK_NULL(m->bignum.bytes);
 
+	/* is it ok to allocate bignum in a little-endian based order? */
 	read(m->bignum.bytes, m->bignum.length, buf);
 
 	return add_object(cache, m);
@@ -450,7 +486,7 @@ decode_object_ref(marshal_t *m, buf_t *buf, cache_t *cache)
 static int
 decode_type_case(marshal_t *m, buf_t *buf, cache_t *cache)
 {
-	int type = 0;
+	char type = 0;
 	read(&type, 1, buf);
 
 	switch (type)
@@ -500,11 +536,10 @@ marshal_decode(const void *data)
 	cache_t cache = {};
 
 	buf_t *buf = &data;
-	int major = 0, minor = 0;
+	char major = 0, minor = 0;
 
 	read(&major, 1, buf);
 	read(&minor, 1, buf);
-
 	if (4 != major || 8 != minor)
 		return NULL;
 
