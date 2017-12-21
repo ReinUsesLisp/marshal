@@ -1,3 +1,5 @@
+IMPORTANT: Big-Endian CPUs won't decode/encode. WIP
+
 Marshal is a C implementation of Ruby's Marshal module which "converts
 collections of Ruby objects into a byte stream,..." according to
 http://ruby-doc.org/core-2.4.2/Marshal.html
